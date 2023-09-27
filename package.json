@@ -12,6 +12,7 @@
   "dependencies": {
     "@angular-eslint/eslint-plugin": "^16.1.0",
     "@angular/animations": "^16.2.4",
+    "@angular/cdk": "^16.2.0",
     "@angular/material": "^16.2.2",
     "@elastic/react-search-ui": "^1.20.2",
     "@elastic/react-search-ui-views": "^1.20.2",
