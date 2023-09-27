@@ -20,6 +20,7 @@
     "@types/node": "^20.6.3",
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.32",
+    "json5": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
