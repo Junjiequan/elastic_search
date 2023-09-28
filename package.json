@@ -24,6 +24,7 @@
     "@xmldom/xmldom": "^0.8.10",
     "json5": "^1.0.1",
     "luxon": "^3.4.0",
+    "moment-timezone": "^0.5.34",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
