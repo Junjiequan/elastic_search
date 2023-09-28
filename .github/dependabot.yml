@@ -17,10 +17,9 @@ updates:
     # Increase the version requirements
     # only when required
     versioning-strategy: increase-if-necessary
-    #reviewers:
-    #  - "hantsy"
-    #assignees:
-    #  - "hantsy"
+    update-types:
+      - 'minor'
+      - 'patch'
     labels:
       - 'dependencies'
       - 'npm'
