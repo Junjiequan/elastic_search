@@ -17,9 +17,6 @@ updates:
     # Increase the version requirements
     # only when required
     versioning-strategy: increase-if-necessary
-    update-types:
-      - 'minor'
-      - 'patch'
     labels:
       - 'dependencies'
       - 'npm'
