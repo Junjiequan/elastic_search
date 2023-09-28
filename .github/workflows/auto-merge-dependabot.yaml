@@ -1,82 +1,15 @@
-name: Dependabot auto-merge
+name: Auto merge dependabot
 
-on: pull_request_target
-
-permissions:
-  pull-requests: write
-  contents: write
-  packages: read
+on:
+  pull_request:
 
 jobs:
-  waitForWorkflows:
-    name: Wait for workflows
+  auto-merge-dependabot:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        ## https://github.com/ahmadnassri/action-dependabot-auto-merge
+      - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
-
-      - name: Wait for workflows
-        id: wait
-        uses: smartcontractkit/chainlink-github-actions/utils/wait-for-workflows@main
-        with:
-          max-timeout: '900'
-          polling-interval: '30'
-          exclude-workflow-names: ''
-          exclude-workflow-ids: ''
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          DEBUG: 'true'
-
-  afterWait:
-    name: after-wait
-    needs: [waitForWorkflows]
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
-    steps:
-      - name: Check needs results
-        if: needs.waitForWorkflows.result != 'success'
-        run: exit 1
-
-  failingTest:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Intentionally failing step
-        run: exit 0
-
-  dependabot:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
-    steps:
-      - name: Dependabot metadata
-        id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v1.3.4
-        with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Approve patch and minor updates
-        if: ${{steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' || steps.dependabot-metadata.outputs.update-type == 'version-update:semver-minor'}}
-        run: |
-          gh pr checkout "$PR_URL"
-            if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ];
-          then
-            gh pr review --approve "$PR_URL"
-          else
-            echo "PR already approved.";
-          fi
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.DEPENDABOT_TOKEN_REAL}}
-
-      - name: Enable auto-merge for Dependabot PRs
-        if: ${{ contains(github.event.pull_request.title, 'bump')}}
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.DEPENDABOT_TOKEN_REAL}}
+          target: patch
+          github-token: ${{ secrets.DEPENDABOT_TOKEN_REAL  }}
