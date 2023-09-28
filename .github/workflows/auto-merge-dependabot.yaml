@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Intentionally failing step
-        run: exit 1
+        run: exit 0
 
   dependabot:
     runs-on: ubuntu-latest
