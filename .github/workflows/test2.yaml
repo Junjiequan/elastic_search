@@ -1,0 +1,16 @@
+name: Test2
+
+on: pull_request_target
+
+permissions:
+  pull-requests: write
+  contents: write
+  packages: read
+
+jobs:
+  failfailfail:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Intentionally failing step233
+        run: exit 0
