@@ -1,8 +1,6 @@
 name: Test
 
-on:
-  pull_request_target:
-    types: [review_requested]
+on: pull_request_target
 
 permissions:
   pull-requests: write
