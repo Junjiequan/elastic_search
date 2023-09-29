@@ -1,15 +1,48 @@
-name: Auto merge dependabot
+name: Dependabot auto-merge
 
-on:
-  pull_request:
+on: pull_request_target
+# on:
+#   workflow_run:
+#     workflows: [dependency-0, dependency-1, dependency-n]
+#     types:
+#       - completed
+
+permissions:
+  pull-requests: write
+  contents: write
+  packages: read
 
 jobs:
-  auto-merge-dependabot:
+  dependabot:
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
     steps:
-      - uses: actions/checkout@v4
-        ## https://github.com/ahmadnassri/action-dependabot-auto-merge
-      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+      - name: Dependabot metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v1.3.4
         with:
-          target: patch
-          github-token: ${{ secrets.DEPENDABOT_TOKEN }}
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Approve patch and minor updates
+        if: ${{steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' || steps.dependabot-metadata.outputs.update-type == 'version-update:semver-minor'}}
+        run: |
+          gh pr checkout "$PR_URL"
+            if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ];
+          then
+            gh pr review --approve "$PR_URL"
+          else
+            echo "PR already approved.";
+          fi
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{ contains(github.event.pull_request.title, 'bump')}}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
